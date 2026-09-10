@@ -52,6 +52,10 @@
   padding: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 16px);
@@ -391,6 +395,18 @@ code {
 .create-form__submit {
   white-space: nowrap;
   height: 44px;
+}
+
+/* Inline validation / request error, shown below the form on failure. */
+.form-error {
+  margin: 0 24px 24px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #b42318; /* red-700 — 5.9:1 on #ffffff, 5.6:1 on #fef3f2 (AA) */
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: var(--radius-sm);
 }
 
 /* ---------- Result ---------- */

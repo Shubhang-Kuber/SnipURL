@@ -43,8 +43,8 @@
             <span>Create a short URL</span>
           </h2>
           <p class="section__subtitle">
-            Enter a fully qualified URL, including the protocol. This preview shows sample
-            output and does not store or resolve links.
+            Enter a fully qualified http or https URL. SnipURL stores it and returns a
+            short link backed by a base62 code.
           </p>
         </div>
 
@@ -76,18 +76,19 @@
             </button>
           </form>
 
-          <div class="result" id="result">
+          <p class="form-error" id="create-error" role="alert" hidden></p>
+
+          <div class="result" id="result" hidden>
             <div class="result__head">
               <span class="result__label">
                 <i data-lucide="check-circle-2"></i>
                 <span>Short link ready</span>
               </span>
-              <span class="result__meta">Sample output</span>
             </div>
 
             <div class="result__row">
-              <span class="result__short" id="result-short">snipurl.io/Zc8Nk1</span>
-              <button class="button button--ghost copy-button" type="button" data-copy="https://snipurl.io/Zc8Nk1">
+              <span class="result__short" id="result-short"></span>
+              <button class="button button--ghost copy-button" type="button" data-copy="">
                 <i data-lucide="copy"></i>
                 <span class="copy-button__text">Copy</span>
               </button>
@@ -95,7 +96,7 @@
 
             <p class="result__origin">
               <i data-lucide="corner-down-right"></i>
-              <span id="result-origin">https://blog.example.com/posts/why-302-not-301-for-link-redirects</span>
+              <span id="result-origin"></span>
             </p>
           </div>
         </div>
@@ -111,8 +112,8 @@
             <span>Retrieve a long URL</span>
           </h2>
           <p class="section__subtitle">
-            Paste a SnipURL short link to see the destination it points to. This preview
-            resolves sample links only and does not follow real redirects.
+            Paste a SnipURL short link or code to look up its destination without
+            following the redirect.
           </p>
         </div>
 
@@ -144,18 +145,19 @@
             </button>
           </form>
 
-          <div class="result" id="retrieve-result">
+          <p class="form-error" id="retrieve-error" role="alert" hidden></p>
+
+          <div class="result" id="retrieve-result" hidden>
             <div class="result__head">
               <span class="result__label">
                 <i data-lucide="check-circle-2"></i>
                 <span>Destination resolved</span>
               </span>
-              <span class="result__meta">Sample output</span>
             </div>
 
             <div class="result__row">
-              <span class="result__short" id="retrieve-long">https://blog.example.com/posts/why-302-not-301-for-link-redirects</span>
-              <button class="button button--ghost copy-button" type="button" data-copy="https://blog.example.com/posts/why-302-not-301-for-link-redirects">
+              <span class="result__short" id="retrieve-long"></span>
+              <button class="button button--ghost copy-button" type="button" data-copy="">
                 <i data-lucide="copy"></i>
                 <span class="copy-button__text">Copy</span>
               </button>
@@ -163,7 +165,7 @@
 
             <p class="result__origin">
               <i data-lucide="corner-down-right"></i>
-              <span id="retrieve-source">snipurl.io/Zc8Nk1 resolves via a 302 temporary redirect</span>
+              <span id="retrieve-source"></span>
             </p>
           </div>
         </div>
@@ -273,7 +275,7 @@
         <span class="brand__name">Snip<span class="brand__name-accent">URL</span></span>
       </div>
       <p class="site-footer__note">
-        Interface preview only. No links are created, stored, or resolved on this page.
+        A minimal URL shortener — base62 short codes, 302 redirects, MySQL-backed.
       </p>
       <nav class="site-footer__links" aria-label="Footer">
         <a href="#create">Shorten</a>

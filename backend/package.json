@@ -1,15 +1,18 @@
 {
   "name": "snipurl-backend",
   "version": "1.0.0",
-  "description": "SnipURL backend — MySQL connection layer",
+  "description": "SnipURL backend — URL shortener API (Express + MySQL)",
   "private": true,
-  "main": "db.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "db:setup": "node migrate.js",
     "db:test": "node test-connection.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "mysql2": "^3.24.4"
   }
 }

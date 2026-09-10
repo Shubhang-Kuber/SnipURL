@@ -1,7 +1,10 @@
-/* SnipURL — interface interactions only.
- * No links are generated, validated, stored, or resolved here.
- * The "Shorten URL" and "Resolve URL" actions reveal fixed sample results;
- * neither calls any service or runs real short-code logic. */
+/* SnipURL — frontend behaviour.
+ *
+ * Talks to the SnipURL API served from the same origin:
+ *   POST /shorten            -> create a short link
+ *   GET  /api/resolve/:code  -> resolve a short link to its destination
+ *
+ * The Recent links table is still static sample data (no /recent endpoint yet). */
 
 (function () {
   "use strict";
@@ -11,113 +14,159 @@
     window.lucide.createIcons();
   }
 
-  // Sample destination <-> short code pairs, kept consistent in both directions.
-  // Presentation only — not a lookup table backed by any store.
-  var SAMPLES = {
-    "https://blog.example.com/posts/why-302-not-301-for-link-redirects": "Zc8Nk1",
-    "https://docs.example.com/engineering/system-design/url-shortener-capacity-estimation": "7Qk2mB",
-    "https://github.com/acme/platform/pull/4821/files": "aF3xR9",
-    "https://analytics.example.com/dashboards/redirect-latency?range=30d": "Lp0Wq4"
-  };
-
-  var REVERSE = {};
-  Object.keys(SAMPLES).forEach(function (longUrl) {
-    REVERSE[SAMPLES[longUrl]] = longUrl;
-  });
-
-  var ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  // Deterministic, non-cryptographic display code so repeated submits of the
-  // same input show a stable value. Not a real short-code algorithm.
-  function sampleCodeFor(url) {
-    if (Object.prototype.hasOwnProperty.call(SAMPLES, url)) {
-      return SAMPLES[url];
-    }
-    var acc = 0;
-    for (var i = 0; i < url.length; i++) {
-      acc = (acc * 31 + url.charCodeAt(i)) % 2176782336;
-    }
-    var code = "";
-    for (var j = 0; j < 6; j++) {
-      code = ALPHABET[acc % 62] + code;
-      acc = Math.floor(acc / 62);
-    }
-    return code;
-  }
-
-  // Pull the bare code out of "snipurl.io/xxxx", "https://snipurl.io/xxxx", or "xxxx".
+  // Extract a bare short code from "snipurl.io/abc", "http://host/abc", or "abc".
   function codeFromInput(value) {
-    var trimmed = value.replace(/^https?:\/\//i, "").replace(/^snipurl\.io\//i, "");
-    return trimmed.replace(/^\/+|\/+$/g, "").split(/[/?#]/)[0];
-  }
-
-  function sampleLongUrlFor(code) {
-    if (Object.prototype.hasOwnProperty.call(REVERSE, code)) {
-      return REVERSE[code];
+    var text = value.trim().replace(/^https?:\/\//i, "");
+    var slash = text.indexOf("/");
+    if (slash >= 0) {
+      text = text.slice(slash + 1);
     }
-    return "https://example.com/r/" + code;
+    return text.replace(/^\/+|\/+$/g, "").split(/[/?#]/)[0];
   }
 
-  // --- Shorten URL --------------------------------------------------------
+  function showError(el, message) {
+    el.textContent = message;
+    el.hidden = false;
+  }
+
+  function clearError(el) {
+    el.textContent = "";
+    el.hidden = true;
+  }
+
+  // Read a fetch Response as JSON, returning { ok, data } so callers can branch
+  // on status without a second await.
+  function readJson(res) {
+    return res
+      .json()
+      .catch(function () {
+        return {};
+      })
+      .then(function (data) {
+        return { ok: res.ok, data: data };
+      });
+  }
+
+  // --- Shorten URL -------------------------------------------------------
   var shortenForm = document.getElementById("create-form");
   if (shortenForm) {
     var longInput = document.getElementById("long-url");
+    var shortenError = document.getElementById("create-error");
     var shortenResult = document.getElementById("result");
     var resultShort = document.getElementById("result-short");
     var resultOrigin = document.getElementById("result-origin");
+    var shortenButton = shortenForm.querySelector("button[type='submit']");
 
     shortenForm.addEventListener("submit", function (event) {
       event.preventDefault();
+      clearError(shortenError);
+
       var value = (longInput.value || "").trim();
       if (!value) {
+        showError(shortenError, "Enter a URL to shorten.");
         longInput.focus();
         return;
       }
-      var code = sampleCodeFor(value);
-      var shortUrl = "https://snipurl.io/" + code;
 
-      resultShort.textContent = "snipurl.io/" + code;
-      resultOrigin.textContent = value;
+      shortenButton.disabled = true;
+      fetch("/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: value })
+      })
+        .then(readJson)
+        .then(function (payload) {
+          if (!payload.ok) {
+            showError(
+              shortenError,
+              payload.data.error || "Could not shorten that URL."
+            );
+            return;
+          }
+          var shortUrl = payload.data.shortUrl;
+          resultShort.textContent = shortUrl;
+          resultOrigin.textContent = value;
 
-      var copyBtn = shortenResult.querySelector(".copy-button");
-      if (copyBtn) {
-        copyBtn.setAttribute("data-copy", shortUrl);
-      }
-      shortenResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          var copyButton = shortenResult.querySelector(".copy-button");
+          if (copyButton) {
+            copyButton.setAttribute("data-copy", shortUrl);
+          }
+          shortenResult.hidden = false;
+          shortenResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        })
+        .catch(function () {
+          showError(
+            shortenError,
+            "Network error — is the SnipURL server running?"
+          );
+        })
+        .finally(function () {
+          shortenButton.disabled = false;
+        });
     });
   }
 
-  // --- Retrieve long URL -------------------------------------------------
+  // --- Retrieve long URL ----------------------------------------------
   var retrieveForm = document.getElementById("retrieve-form");
   if (retrieveForm) {
     var shortInput = document.getElementById("short-url");
+    var retrieveError = document.getElementById("retrieve-error");
     var retrieveResult = document.getElementById("retrieve-result");
     var retrieveLong = document.getElementById("retrieve-long");
     var retrieveSource = document.getElementById("retrieve-source");
+    var retrieveButton = retrieveForm.querySelector("button[type='submit']");
 
     retrieveForm.addEventListener("submit", function (event) {
       event.preventDefault();
-      var value = (shortInput.value || "").trim();
-      if (!value) {
+      clearError(retrieveError);
+
+      var raw = (shortInput.value || "").trim();
+      if (!raw) {
+        showError(retrieveError, "Enter a short link or code to resolve.");
         shortInput.focus();
         return;
       }
-      var code = codeFromInput(value);
-      var longUrl = sampleLongUrlFor(code);
 
-      retrieveLong.textContent = longUrl;
-      retrieveSource.textContent =
-        "snipurl.io/" + code + " resolves via a 302 temporary redirect";
-
-      var copyBtn = retrieveResult.querySelector(".copy-button");
-      if (copyBtn) {
-        copyBtn.setAttribute("data-copy", longUrl);
+      var code = codeFromInput(raw);
+      if (!code) {
+        showError(retrieveError, "That does not look like a SnipURL short link.");
+        return;
       }
-      retrieveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+      retrieveButton.disabled = true;
+      fetch("/api/resolve/" + encodeURIComponent(code))
+        .then(readJson)
+        .then(function (payload) {
+          if (!payload.ok) {
+            showError(
+              retrieveError,
+              payload.data.error || "Could not resolve that code."
+            );
+            return;
+          }
+          retrieveLong.textContent = payload.data.longUrl;
+          retrieveSource.textContent = code + " points to this destination";
+
+          var copyButton = retrieveResult.querySelector(".copy-button");
+          if (copyButton) {
+            copyButton.setAttribute("data-copy", payload.data.longUrl);
+          }
+          retrieveResult.hidden = false;
+          retrieveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        })
+        .catch(function () {
+          showError(
+            retrieveError,
+            "Network error — is the SnipURL server running?"
+          );
+        })
+        .finally(function () {
+          retrieveButton.disabled = false;
+        });
     });
   }
 
-  // --- Copy buttons ----------------------------------------------------
+  // --- Copy buttons --------------------------------------------------
   function flashCopied(button) {
     button.classList.add("is-copied");
     var textEl = button.querySelector(".copy-button__text");
@@ -148,7 +197,7 @@
           flashCopied(button);
         },
         function () {
-          /* Clipboard permission denied; nothing else to do in a preview. */
+          /* Clipboard permission denied; nothing else to do. */
         }
       );
     }

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnipURL — URL shortener</title>
+  <meta name="description" content="SnipURL interface preview — shorten a long URL and resolve a short link back to its destination." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#create">Skip to the shortener</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="#top" aria-label="SnipURL home">
+        <span class="brand__mark" aria-hidden="true">
+          <i data-lucide="scissors"></i>
+        </span>
+        <span class="brand__name">Snip<span class="brand__name-accent">URL</span></span>
+      </a>
+
+      <nav class="site-nav" aria-label="Primary">
+        <a class="site-nav__link" href="#create">Shorten</a>
+        <a class="site-nav__link" href="#retrieve">Retrieve</a>
+        <a class="site-nav__link" href="#recent">Recent links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Create short URL -->
+    <section id="create" class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title">
+            <i data-lucide="link"></i>
+            <span>Create a short URL</span>
+          </h2>
+          <p class="section__subtitle">
+            Enter a fully qualified URL, including the protocol. This preview shows sample
+            output and does not store or resolve links.
+          </p>
+        </div>
+
+        <div class="card create-card">
+          <form class="create-form" id="create-form" novalidate>
+            <div class="field">
+              <label class="field__label" for="long-url">Destination URL</label>
+              <div class="input-group">
+                <span class="input-group__icon" aria-hidden="true">
+                  <i data-lucide="globe"></i>
+                </span>
+                <input
+                  class="input"
+                  type="url"
+                  id="long-url"
+                  name="long-url"
+                  inputmode="url"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="https://example.com/path/to/a/very/long/resource"
+                />
+              </div>
+              <p class="field__hint">Supported schemes: <code>http</code> and <code>https</code>.</p>
+            </div>
+
+            <button class="button button--primary create-form__submit" type="submit">
+              <i data-lucide="scissors"></i>
+              <span>Shorten URL</span>
+            </button>
+          </form>
+
+          <div class="result" id="result">
+            <div class="result__head">
+              <span class="result__label">
+                <i data-lucide="check-circle-2"></i>
+                <span>Short link ready</span>
+              </span>
+              <span class="result__meta">Sample output</span>
+            </div>
+
+            <div class="result__row">
+              <span class="result__short" id="result-short">snipurl.io/Zc8Nk1</span>
+              <button class="button button--ghost copy-button" type="button" data-copy="https://snipurl.io/Zc8Nk1">
+                <i data-lucide="copy"></i>
+                <span class="copy-button__text">Copy</span>
+              </button>
+            </div>
+
+            <p class="result__origin">
+              <i data-lucide="corner-down-right"></i>
+              <span id="result-origin">https://blog.example.com/posts/why-302-not-301-for-link-redirects</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Retrieve long URL -->
+    <section id="retrieve" class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title">
+            <i data-lucide="undo-2"></i>
+            <span>Retrieve a long URL</span>
+          </h2>
+          <p class="section__subtitle">
+            Paste a SnipURL short link to see the destination it points to. This preview
+            resolves sample links only and does not follow real redirects.
+          </p>
+        </div>
+
+        <div class="card create-card">
+          <form class="create-form" id="retrieve-form" novalidate>
+            <div class="field">
+              <label class="field__label" for="short-url">Short URL</label>
+              <div class="input-group">
+                <span class="input-group__icon" aria-hidden="true">
+                  <i data-lucide="link-2"></i>
+                </span>
+                <input
+                  class="input"
+                  type="text"
+                  id="short-url"
+                  name="short-url"
+                  inputmode="url"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="snipurl.io/Zc8Nk1"
+                />
+              </div>
+              <p class="field__hint">Accepts a bare <code>snipurl.io/&lt;code&gt;</code> or the full <code>https://</code> form.</p>
+            </div>
+
+            <button class="button button--primary create-form__submit" type="submit">
+              <i data-lucide="arrow-right"></i>
+              <span>Resolve URL</span>
+            </button>
+          </form>
+
+          <div class="result" id="retrieve-result">
+            <div class="result__head">
+              <span class="result__label">
+                <i data-lucide="check-circle-2"></i>
+                <span>Destination resolved</span>
+              </span>
+              <span class="result__meta">Sample output</span>
+            </div>
+
+            <div class="result__row">
+              <span class="result__short" id="retrieve-long">https://blog.example.com/posts/why-302-not-301-for-link-redirects</span>
+              <button class="button button--ghost copy-button" type="button" data-copy="https://blog.example.com/posts/why-302-not-301-for-link-redirects">
+                <i data-lucide="copy"></i>
+                <span class="copy-button__text">Copy</span>
+              </button>
+            </div>
+
+            <p class="result__origin">
+              <i data-lucide="corner-down-right"></i>
+              <span id="retrieve-source">snipurl.io/Zc8Nk1 resolves via a 302 temporary redirect</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent links -->
+    <section id="recent" class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title">
+            <i data-lucide="history"></i>
+            <span>Recent links</span>
+          </h2>
+          <p class="section__subtitle">
+            A sample of previously created short links. Figures below are illustrative.
+          </p>
+        </div>
+
+        <div class="card table-card">
+          <div class="table-scroll">
+            <table class="links-table">
+              <caption class="sr-only">Recently created short links with their destinations, creation dates, and click counts.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Short link</th>
+                  <th scope="col">Destination</th>
+                  <th scope="col" class="col-numeric">Created</th>
+                  <th scope="col" class="col-numeric">Clicks</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="mono">snipurl.io/7Qk2mB</span></td>
+                  <td class="col-origin">
+                    <span class="truncate" title="https://docs.example.com/engineering/system-design/url-shortener-capacity-estimation">
+                      https://docs.example.com/engineering/system-design/url-shortener-capacity-estimation
+                    </span>
+                  </td>
+                  <td class="col-numeric">2026-09-08</td>
+                  <td class="col-numeric">1,284</td>
+                  <td class="col-action">
+                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/7Qk2mB" aria-label="Copy snipurl.io/7Qk2mB">
+                      <i data-lucide="copy"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mono">snipurl.io/aF3xR9</span></td>
+                  <td class="col-origin">
+                    <span class="truncate" title="https://github.com/acme/platform/pull/4821/files">
+                      https://github.com/acme/platform/pull/4821/files
+                    </span>
+                  </td>
+                  <td class="col-numeric">2026-09-07</td>
+                  <td class="col-numeric">512</td>
+                  <td class="col-action">
+                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/aF3xR9" aria-label="Copy snipurl.io/aF3xR9">
+                      <i data-lucide="copy"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mono">snipurl.io/Lp0Wq4</span></td>
+                  <td class="col-origin">
+                    <span class="truncate" title="https://analytics.example.com/dashboards/redirect-latency?range=30d">
+                      https://analytics.example.com/dashboards/redirect-latency?range=30d
+                    </span>
+                  </td>
+                  <td class="col-numeric">2026-09-05</td>
+                  <td class="col-numeric">88</td>
+                  <td class="col-action">
+                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/Lp0Wq4" aria-label="Copy snipurl.io/Lp0Wq4">
+                      <i data-lucide="copy"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mono">snipurl.io/Zc8Nk1</span></td>
+                  <td class="col-origin">
+                    <span class="truncate" title="https://blog.example.com/posts/why-302-not-301-for-link-redirects">
+                      https://blog.example.com/posts/why-302-not-301-for-link-redirects
+                    </span>
+                  </td>
+                  <td class="col-numeric">2026-09-01</td>
+                  <td class="col-numeric">3,940</td>
+                  <td class="col-action">
+                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/Zc8Nk1" aria-label="Copy snipurl.io/Zc8Nk1">
+                      <i data-lucide="copy"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <span class="brand__mark" aria-hidden="true"><i data-lucide="scissors"></i></span>
+        <span class="brand__name">Snip<span class="brand__name-accent">URL</span></span>
+      </div>
+      <p class="site-footer__note">
+        Interface preview only. No links are created, stored, or resolved on this page.
+      </p>
+      <nav class="site-footer__links" aria-label="Footer">
+        <a href="#create">Shorten</a>
+        <a href="#retrieve">Retrieve</a>
+        <a href="#recent">Recent links</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

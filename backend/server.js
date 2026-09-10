@@ -17,6 +17,7 @@ const express = require("express");
 
 const shortenRoute = require("./routes/shorten");
 const retrieveRoute = require("./routes/retrieve");
+const recentRoute = require("./routes/recent");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -26,8 +27,10 @@ app.use(express.json());
 // Static frontend (index.html, app.js, styles.css) at the site root.
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Services — two separate route handlers.
+// Services — separate route handlers. The bare GET /:shortCode redirect in
+// retrieveRoute is a catch-all, so it is mounted last.
 app.use("/", shortenRoute);
+app.use("/", recentRoute);
 app.use("/", retrieveRoute);
 
 // Unmatched route — explicit JSON 404, never a silent hang.

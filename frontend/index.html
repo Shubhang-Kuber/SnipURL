@@ -181,87 +181,28 @@
             <span>Recent links</span>
           </h2>
           <p class="section__subtitle">
-            A sample of previously created short links. Figures below are illustrative.
+            The 10 most recently created short links.
           </p>
         </div>
 
         <div class="card table-card">
-          <div class="table-scroll">
+          <div class="table-scroll" id="recent-table-wrap" hidden>
             <table class="links-table">
-              <caption class="sr-only">Recently created short links with their destinations, creation dates, and click counts.</caption>
+              <caption class="sr-only">Recently created short links with their destinations and creation dates.</caption>
               <thead>
                 <tr>
                   <th scope="col">Short link</th>
                   <th scope="col">Destination</th>
                   <th scope="col" class="col-numeric">Created</th>
-                  <th scope="col" class="col-numeric">Clicks</th>
                   <th scope="col"><span class="sr-only">Actions</span></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><span class="mono">snipurl.io/7Qk2mB</span></td>
-                  <td class="col-origin">
-                    <span class="truncate" title="https://docs.example.com/engineering/system-design/url-shortener-capacity-estimation">
-                      https://docs.example.com/engineering/system-design/url-shortener-capacity-estimation
-                    </span>
-                  </td>
-                  <td class="col-numeric">2026-09-08</td>
-                  <td class="col-numeric">1,284</td>
-                  <td class="col-action">
-                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/7Qk2mB" aria-label="Copy snipurl.io/7Qk2mB">
-                      <i data-lucide="copy"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mono">snipurl.io/aF3xR9</span></td>
-                  <td class="col-origin">
-                    <span class="truncate" title="https://github.com/acme/platform/pull/4821/files">
-                      https://github.com/acme/platform/pull/4821/files
-                    </span>
-                  </td>
-                  <td class="col-numeric">2026-09-07</td>
-                  <td class="col-numeric">512</td>
-                  <td class="col-action">
-                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/aF3xR9" aria-label="Copy snipurl.io/aF3xR9">
-                      <i data-lucide="copy"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mono">snipurl.io/Lp0Wq4</span></td>
-                  <td class="col-origin">
-                    <span class="truncate" title="https://analytics.example.com/dashboards/redirect-latency?range=30d">
-                      https://analytics.example.com/dashboards/redirect-latency?range=30d
-                    </span>
-                  </td>
-                  <td class="col-numeric">2026-09-05</td>
-                  <td class="col-numeric">88</td>
-                  <td class="col-action">
-                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/Lp0Wq4" aria-label="Copy snipurl.io/Lp0Wq4">
-                      <i data-lucide="copy"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mono">snipurl.io/Zc8Nk1</span></td>
-                  <td class="col-origin">
-                    <span class="truncate" title="https://blog.example.com/posts/why-302-not-301-for-link-redirects">
-                      https://blog.example.com/posts/why-302-not-301-for-link-redirects
-                    </span>
-                  </td>
-                  <td class="col-numeric">2026-09-01</td>
-                  <td class="col-numeric">3,940</td>
-                  <td class="col-action">
-                    <button class="button button--ghost button--icon copy-button" type="button" data-copy="https://snipurl.io/Zc8Nk1" aria-label="Copy snipurl.io/Zc8Nk1">
-                      <i data-lucide="copy"></i>
-                    </button>
-                  </td>
-                </tr>
+              <tbody id="recent-body">
+                <!-- Rows injected by app.js from GET /api/recent -->
               </tbody>
             </table>
           </div>
+          <p class="table-message" id="recent-message">Loading recent links&hellip;</p>
         </div>
       </div>
     </section>

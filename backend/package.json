@@ -1,0 +1,15 @@
+{
+  "name": "snipurl-backend",
+  "version": "1.0.0",
+  "description": "SnipURL backend — MySQL connection layer",
+  "private": true,
+  "main": "db.js",
+  "scripts": {
+    "db:setup": "node migrate.js",
+    "db:test": "node test-connection.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mysql2": "^3.24.4"
+  }
+}

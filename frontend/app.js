@@ -93,6 +93,10 @@
           }
           shortenResult.hidden = false;
           shortenResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+          // Clear the input only now that a 2xx response is in hand; the result
+          // card above stays visible.
+          longInput.value = "";
         })
         .catch(function () {
           showError(
@@ -153,6 +157,10 @@
           }
           retrieveResult.hidden = false;
           retrieveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+          // Clear the input only now that a 2xx response is in hand; the result
+          // card above stays visible.
+          shortInput.value = "";
         })
         .catch(function () {
           showError(

@@ -121,10 +121,17 @@
     var retrieveLong = document.getElementById("retrieve-long");
     var retrieveSource = document.getElementById("retrieve-source");
     var retrieveButton = retrieveForm.querySelector("button[type='submit']");
+    var popupFallback = document.getElementById("retrieve-popup-fallback");
+    var openLink = document.getElementById("retrieve-open-link");
+
+    // Bumped on every submit so a response from an older request — one that
+    // arrives after a newer request has already run — can't open a second tab.
+    var retrieveRequestId = 0;
 
     retrieveForm.addEventListener("submit", function (event) {
       event.preventDefault();
       clearError(retrieveError);
+      popupFallback.hidden = true;
 
       var raw = (shortInput.value || "").trim();
       if (!raw) {
@@ -139,10 +146,18 @@
         return;
       }
 
+      var thisRequestId = ++retrieveRequestId;
+
       retrieveButton.disabled = true;
       fetch("/api/resolve/" + encodeURIComponent(code))
         .then(readJson)
         .then(function (payload) {
+          // A newer submit has already taken over this result card — don't
+          // act on this stale response (and don't open a stray tab for it).
+          if (thisRequestId !== retrieveRequestId) {
+            return;
+          }
+
           if (!payload.ok) {
             showError(
               retrieveError,
@@ -150,12 +165,13 @@
             );
             return;
           }
-          retrieveLong.textContent = payload.data.longUrl;
+          var longUrl = payload.data.longUrl;
+          retrieveLong.textContent = longUrl;
           retrieveSource.textContent = code + " points to this destination";
 
           var copyButton = retrieveResult.querySelector(".copy-button");
           if (copyButton) {
-            copyButton.setAttribute("data-copy", payload.data.longUrl);
+            copyButton.setAttribute("data-copy", longUrl);
           }
           retrieveResult.hidden = false;
           retrieveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -163,15 +179,31 @@
           // Clear the input only now that a 2xx response is in hand; the result
           // card above stays visible.
           shortInput.value = "";
+
+          // Open the destination automatically. Some browsers treat a tab
+          // opened from an async response (rather than directly inside the
+          // click handler) as a popup and block it — window.open then
+          // returns null/undefined instead of throwing, so fall back to a
+          // manual link the user can click.
+          var opened = window.open(longUrl, "_blank");
+          if (!opened) {
+            openLink.setAttribute("href", longUrl);
+            popupFallback.hidden = false;
+          }
         })
         .catch(function () {
+          if (thisRequestId !== retrieveRequestId) {
+            return;
+          }
           showError(
             retrieveError,
             "Network error — is the SnipURL server running?"
           );
         })
         .finally(function () {
-          retrieveButton.disabled = false;
+          if (thisRequestId === retrieveRequestId) {
+            retrieveButton.disabled = false;
+          }
         });
     });
   }

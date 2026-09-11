@@ -483,6 +483,31 @@ code {
   color: var(--border-strong);
 }
 
+.result__popup-fallback {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #b54708; /* amber-700 */
+  background: #fffaeb;
+  border: 1px solid #fedf89;
+  border-radius: var(--radius-sm);
+}
+
+.result__popup-fallback [data-lucide] {
+  color: #b54708;
+  width: 16px;
+  height: 16px;
+}
+
+.result__popup-fallback-link {
+  margin-left: auto;
+}
+
 .copy-button.is-copied {
   color: var(--accent-hover);
 }

@@ -112,13 +112,3 @@ CREATE TABLE urls (
 - **Keyspace exhaustion:** avoided by choosing `n = 7`, giving ~3.5 trillion codes — far beyond realistic scale for this project.
 - **Counter contention under concurrent writes:** identified as a future bottleneck (multiple app instances competing for the same auto-increment counter), addressed in the scaling path below rather than built now, since a single instance has no contention to solve.
 
----
-
-## Scaling Path (Documented, Not Built)
-
-Deliberately excluded from the current build — for a single-instance project there's nothing to justify their complexity:
-
-- **Load balancer** — only needed once there are multiple app server instances to distribute traffic across. A single instance has nothing to balance.
-- **Token/Key generation service** — only needed once multiple app instances compete for the same DB counter. It would pre-allocate ID ranges (e.g. 1000 at a time) to each instance, turning many DB hits into one, avoiding write contention under load.
-
-These two are linked: no load balancer → no multiple instances → no counter contention → no token service needed. If the project scales beyond a single instance, this is the order in which each piece gets introduced.

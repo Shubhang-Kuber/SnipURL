@@ -10,6 +10,8 @@ A URL shortening service split into two independent operations: creating short U
 UI → API Gateway → Shortener Service → MySQL Database
 ```
 
+![SnipURL system architecture diagram](docs/snipurl-system-design.png)
+
 The API Gateway routes requests based on HTTP method + path (not custom logic):
 - `POST /shorten` → Create Short URL service
 - `GET /:shortCode` → Retrieve Long URL service
